@@ -1,10 +1,12 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("student")
@@ -17,8 +19,12 @@ public class StudentController {
     }
 
     @GetMapping("{id}")
-    public Student getStudentInfo(@PathVariable Long id) {
-        return studentService.getStudentInfo(id);
+    public ResponseEntity<Student> getStudentInfo(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(studentService.getStudentInfo(id));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping
@@ -27,13 +33,21 @@ public class StudentController {
     }
 
     @PutMapping
-    public Student editStudentInfo(@RequestBody Student student) {
-        return studentService.editStudentInfo(student);
+    public ResponseEntity<Student> editStudentInfo(@RequestBody Student student) {
+        Student processedStudent = studentService.editStudentInfo(student);
+        if (processedStudent == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(processedStudent);
     }
 
     @DeleteMapping("{id}")
-    public Student removeStudent(@PathVariable Long id) {
-        return studentService.removeStudent(id);
+    public ResponseEntity<Student> removeStudent(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(studentService.removeStudent(id));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping

@@ -1,10 +1,12 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("faculty")
@@ -17,8 +19,12 @@ public class FacultyController {
     }
 
     @GetMapping("{id}")
-    public Faculty getStudentInfo(@PathVariable Long id) {
-        return facultyService.getFacultyInfo(id);
+    public ResponseEntity<Faculty> getStudentInfo(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(facultyService.getFacultyInfo(id));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping
@@ -27,13 +33,21 @@ public class FacultyController {
     }
 
     @PutMapping
-    public Faculty editStudentInfo(@RequestBody Faculty faculty) {
-        return facultyService.editFacultyInfo(faculty);
+    public ResponseEntity<Faculty> editStudentInfo(@RequestBody Faculty faculty) {
+        Faculty processedFaculty = facultyService.editFacultyInfo(faculty);
+        if (processedFaculty == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(processedFaculty);
     }
 
     @DeleteMapping("{id}")
-    public Faculty removeStudent(@PathVariable Long id) {
-        return facultyService.removeFaculty(id);
+    public ResponseEntity<Faculty> removeStudent(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(facultyService.removeFaculty(id));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping
