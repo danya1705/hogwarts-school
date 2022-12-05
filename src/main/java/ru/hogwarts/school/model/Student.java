@@ -8,11 +8,14 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_generator")
-    @SequenceGenerator(name="student_generator", sequenceName = "student_seq", allocationSize = 1)
+    @SequenceGenerator(name = "student_generator", sequenceName = "student_seq", allocationSize = 1)
     private long id;
     private String name;
     private int age;
 
+    @ManyToOne
+    @JoinColumn(name = "faculty_id")
+    private Faculty faculty;
 
     public Long getId() {
         return id;
@@ -36,6 +39,14 @@ public class Student {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public Faculty getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
     }
 
     @Override
