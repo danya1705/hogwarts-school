@@ -2,11 +2,9 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class FacultyService {
@@ -18,12 +16,12 @@ public class FacultyService {
     }
 
     public Faculty addFaculty(Faculty faculty) {
-        faculty.setId(0L);
+        faculty.setId(null);
         return facultyRepository.save(faculty);
     }
 
-    public Faculty getFacultyInfo(long id) {
-        return facultyRepository.findById(id).orElseThrow();
+    public Optional<Faculty> getFacultyInfo(long id) {
+        return facultyRepository.findById(id);
     }
 
     public Faculty editFacultyInfo(Faculty faculty) {
@@ -33,8 +31,8 @@ public class FacultyService {
         return null;
     }
 
-    public Faculty removeFaculty(long id) {
-        Faculty deletedFaculty = facultyRepository.findById(id).orElseThrow();
+    public Optional<Faculty> removeFaculty(long id) {
+        Optional<Faculty> deletedFaculty = facultyRepository.findById(id);
         facultyRepository.deleteById(id);
         return deletedFaculty;
     }
@@ -43,17 +41,9 @@ public class FacultyService {
         return facultyRepository.findAll();
     }
 
-    public Collection<Faculty> getFaculties(String name, String color) {
-        if (name == null) {
-            return facultyRepository.findByColorIgnoreCase(color);
-        } else if (color == null) {
-            return facultyRepository.findByNameIgnoreCase(name);
-        } else {
-            return facultyRepository.findByNameIgnoreCaseAndColorIgnoreCase(name, color);
-        }
-    }
-
-    public Set<Student> getStudents(Long id) {
-        return facultyRepository.findById(id).orElseThrow().getStudents();
+    public Set<Faculty> getFaculties(String nameOrColor) {
+        Set<Faculty> set = new HashSet<>(facultyRepository.findByNameIgnoreCase(nameOrColor));
+        set.addAll(facultyRepository.findByColorIgnoreCase(nameOrColor));
+        return set;
     }
 }

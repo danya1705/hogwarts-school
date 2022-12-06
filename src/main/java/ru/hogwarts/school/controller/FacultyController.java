@@ -7,7 +7,6 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 @RestController
@@ -22,19 +21,19 @@ public class FacultyController {
 
     @GetMapping("{id}")
     public ResponseEntity<Faculty> getFacultyInfo(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(facultyService.getFacultyInfo(id));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.badRequest().build();
+        if (facultyService.getFacultyInfo(id).isPresent()) {
+            return ResponseEntity.ok(facultyService.getFacultyInfo(id).get());
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping("/get_students")
-    public ResponseEntity<Set<Student>> getStudents(@RequestParam Long id) {
-        try {
-            return ResponseEntity.ok(facultyService.getStudents(id));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.badRequest().build();
+    @GetMapping("/{id}/students")
+    public ResponseEntity<Set<Student>> getStudents(@PathVariable Long id) {
+        if (facultyService.getFacultyInfo(id).isPresent()) {
+            return ResponseEntity.ok(facultyService.getFacultyInfo(id).get().getStudents());
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -47,26 +46,32 @@ public class FacultyController {
     public ResponseEntity<Faculty> editFacultyInfo(@RequestBody Faculty faculty) {
         Faculty processedFaculty = facultyService.editFacultyInfo(faculty);
         if (processedFaculty == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(processedFaculty);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Faculty> removeFaculty(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(facultyService.removeFaculty(id));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.badRequest().build();
+        if (facultyService.removeFaculty(id).isPresent()) {
+            return ResponseEntity.ok(facultyService.removeFaculty(id).get());
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("")
-    public Collection<Faculty> getFacultiesByNameOrColor(@RequestParam(required = false) String name, @RequestParam(required = false) String color) {
-        if (color == null && name == null) {
-            return facultyService.getFaculties();
-        } else {
-            return facultyService.getFaculties(name, color);
-        }
+    public Collection<Faculty> getFaculties() {
+        return facultyService.getFaculties();
+    }
+
+    @GetMapping(value = "", params = {"color"})
+    public Collection<Faculty> getFacultiesByColor(@RequestParam(value = "color") String Color) {
+        return facultyService.getFaculties(Color);
+    }
+
+    @GetMapping(value = "", params = {"name_or_color"})
+    public Collection<Faculty> getFacultiesByNameOrColor(@RequestParam(value = "name_or_color") String nameOrColor) {
+            return facultyService.getFaculties(nameOrColor);
     }
 }

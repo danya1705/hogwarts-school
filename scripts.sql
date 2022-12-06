@@ -1,9 +1,9 @@
-SELECT * FROM student WHERE age > 10 AND age < 20;
+SELECT * FROM student WHERE age BETWEEN 10 AND 20;
 
 SELECT name FROM student;
 
 SELECT * FROM student WHERE name LIKE '%м%';
 
-SELECT * FROM student WHERE age < 30;
+SELECT * FROM student WHERE age < id;
 
 SELECT * FROM student ORDER BY age;
