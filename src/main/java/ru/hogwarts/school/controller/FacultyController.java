@@ -7,7 +7,7 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("faculty")
@@ -21,20 +21,18 @@ public class FacultyController {
 
     @GetMapping("{id}")
     public ResponseEntity<Faculty> getFacultyInfo(@PathVariable Long id) {
-        if (facultyService.getFacultyInfo(id).isPresent()) {
-            return ResponseEntity.ok(facultyService.getFacultyInfo(id).get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Optional<Faculty> faculty = facultyService.getFaculty(id);
+        return faculty
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}/students")
-    public ResponseEntity<Set<Student>> getStudents(@PathVariable Long id) {
-        if (facultyService.getFacultyInfo(id).isPresent()) {
-            return ResponseEntity.ok(facultyService.getFacultyInfo(id).get().getStudents());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Collection<Student>> getStudents(@PathVariable Long id) {
+        Optional<Faculty> faculty = facultyService.getFaculty(id);
+        return faculty
+                .map(value -> ResponseEntity.ok(facultyService.getStudents(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("")
@@ -44,20 +42,18 @@ public class FacultyController {
 
     @PutMapping("")
     public ResponseEntity<Faculty> editFacultyInfo(@RequestBody Faculty faculty) {
-        Faculty processedFaculty = facultyService.editFacultyInfo(faculty);
-        if (processedFaculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(processedFaculty);
+        Optional<Faculty> processedFaculty = Optional.ofNullable(facultyService.editFacultyInfo(faculty));
+        return processedFaculty
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Faculty> removeFaculty(@PathVariable Long id) {
-        if (facultyService.removeFaculty(id).isPresent()) {
-            return ResponseEntity.ok(facultyService.removeFaculty(id).get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Optional<Faculty> faculty = facultyService.removeFaculty(id);
+        return faculty
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("")
@@ -65,13 +61,13 @@ public class FacultyController {
         return facultyService.getFaculties();
     }
 
-    @GetMapping(value = "", params = {"color"})
-    public Collection<Faculty> getFacultiesByColor(@RequestParam(value = "color") String Color) {
-        return facultyService.getFaculties(Color);
+    @GetMapping(value = "/color")
+    public Collection<Faculty> getFacultiesByColor(@RequestParam String Color) {
+        return facultyService.getFacultiesByColor(Color);
     }
 
-    @GetMapping(value = "", params = {"name_or_color"})
-    public Collection<Faculty> getFacultiesByNameOrColor(@RequestParam(value = "name_or_color") String nameOrColor) {
-            return facultyService.getFaculties(nameOrColor);
+    @GetMapping(value = "/name_or_color")
+    public Collection<Faculty> getFacultiesByNameOrColor(@RequestParam String nameOrColor) {
+            return facultyService.getFacultiesByNameOrColor(nameOrColor);
     }
 }

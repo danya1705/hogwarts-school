@@ -1,7 +1,6 @@
 package ru.hogwarts.school.model;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 public class Faculty {
@@ -9,12 +8,9 @@ public class Faculty {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "faculty_generator")
     @SequenceGenerator(name="faculty_generator", sequenceName = "faculty_seq", allocationSize = 1)
-    private long id;
+    private Long id;
     private String name;
     private String color;
-
-    @OneToMany(mappedBy = "faculty")
-    private Set<Student> students;
 
     public Long getId() {
         return id;
@@ -40,11 +36,4 @@ public class Faculty {
         this.color = color;
     }
 
-    public Set<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
 }

@@ -2,6 +2,7 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.Collection;
@@ -11,22 +12,30 @@ import java.util.Optional;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final FacultyRepository facultyRepository;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, FacultyRepository facultyRepository) {
         this.studentRepository = studentRepository;
+        this.facultyRepository = facultyRepository;
     }
 
     public Student addStudent(Student student) {
         student.setId(null);
+        if (!facultyRepository.existsById(student.getFaculty().getId())) {
+            student.setFaculty(null);
+        }
         return studentRepository.save(student);
     }
 
-    public Optional<Student> getStudentInfo(long id) {
+    public Optional<Student> getStudent(long id) {
         return studentRepository.findById(id);
     }
 
     public Student editStudentInfo(Student student) {
         if (studentRepository.existsById(student.getId())) {
+            if (!facultyRepository.existsById(student.getFaculty().getId())) {
+                student.setFaculty(null);
+            }
             return studentRepository.save(student);
         }
         return null;
@@ -34,7 +43,9 @@ public class StudentService {
 
     public Optional<Student> removeStudent(long id) {
         Optional<Student> deletedStudent = studentRepository.findById(id);
-        studentRepository.deleteById(id);
+        if (deletedStudent.isPresent()) {
+            studentRepository.deleteById(id);
+        }
         return deletedStudent;
     }
 
@@ -46,7 +57,7 @@ public class StudentService {
         return studentRepository.findByAge(age);
     }
 
-    public Collection<Student> getStudents(Integer minAge, Integer maxAge) {
+    public Collection<Student> getStudents(int minAge, int maxAge) {
         return studentRepository.findByAgeBetween(minAge,maxAge);
     }
 
