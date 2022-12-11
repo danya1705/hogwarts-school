@@ -33,7 +33,7 @@ public class StudentService {
 
     public Student editStudentInfo(Student student) {
         if (studentRepository.existsById(student.getId())) {
-            if (!facultyRepository.existsById(student.getFaculty().getId())) {
+            if (student.getFaculty() != null && !facultyRepository.existsById(student.getFaculty().getId())) {
                 student.setFaculty(null);
             }
             return studentRepository.save(student);
