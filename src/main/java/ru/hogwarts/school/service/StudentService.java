@@ -2,7 +2,6 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
-import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.Collection;
@@ -12,16 +11,16 @@ import java.util.Optional;
 public class StudentService {
 
     private final StudentRepository studentRepository;
-    private final FacultyRepository facultyRepository;
+    private final FacultyService facultyService;
 
-    public StudentService(StudentRepository studentRepository, FacultyRepository facultyRepository) {
+    public StudentService(StudentRepository studentRepository, FacultyService facultyService) {
         this.studentRepository = studentRepository;
-        this.facultyRepository = facultyRepository;
+        this.facultyService = facultyService;
     }
 
     public Student addStudent(Student student) {
         student.setId(null);
-        if (!facultyRepository.existsById(student.getFaculty().getId())) {
+        if (facultyService.getFaculty(student.getFaculty().getId()).isEmpty()) {
             student.setFaculty(null);
         }
         return studentRepository.save(student);
@@ -33,7 +32,7 @@ public class StudentService {
 
     public Student editStudentInfo(Student student) {
         if (studentRepository.existsById(student.getId())) {
-            if (student.getFaculty() != null && !facultyRepository.existsById(student.getFaculty().getId())) {
+            if (student.getFaculty() != null && facultyService.getFaculty(student.getFaculty().getId()).isEmpty()) {
                 student.setFaculty(null);
             }
             return studentRepository.save(student);
@@ -59,6 +58,18 @@ public class StudentService {
 
     public Collection<Student> getStudents(int minAge, int maxAge) {
         return studentRepository.findByAgeBetween(minAge,maxAge);
+    }
+
+    public int getStudentsNumber() {
+        return studentRepository.getStudentsNumber();
+    }
+
+    public double getAverageAge() {
+        return studentRepository.getAverageAge();
+    }
+
+    public Collection<Student> getLastStudents() {
+        return studentRepository.getLastStudents();
     }
 
 }
