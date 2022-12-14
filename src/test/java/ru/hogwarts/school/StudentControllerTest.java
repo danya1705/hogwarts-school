@@ -20,6 +20,7 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -204,6 +205,28 @@ public class StudentControllerTest {
 
         ResponseEntity<List<Student>> responseEntity = testRestTemplate.exchange("http://localhost:" + port + "/student/age_between?minAge={minAge}&maxAge={maxAge}", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
         }, minAge, maxAge);
+        assertThat(responseEntity.getBody()).containsExactlyInAnyOrderElementsOf(expectedStudentsList);
+    }
+
+    @Test
+    void getLastStudentsTest() {
+
+        int studentsQuantity = 10;
+        Student student;
+        List<Student> studentsList = new ArrayList<>();
+
+        for (int i = 0; i < studentsQuantity; i++) {
+            student = addStudent(generateStudent(addFaculty(generateFaculty())));
+            studentsList.add(student);
+        }
+
+        List<Student> expectedStudentsList = studentsList.stream()
+                .sorted(Comparator.comparing(Student::getId,Comparator.reverseOrder()))
+                .limit(5)
+                .collect(Collectors.toList());
+
+        ResponseEntity<List<Student>> responseEntity = testRestTemplate.exchange("http://localhost:" + port + "/student/last-students", HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+        });
         assertThat(responseEntity.getBody()).containsExactlyInAnyOrderElementsOf(expectedStudentsList);
     }
 
