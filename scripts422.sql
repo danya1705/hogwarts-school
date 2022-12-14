@@ -12,12 +12,7 @@ CREATE TABLE person
     name       TEXT,
     age        INTEGER,
     permission BOOLEAN,
-    car_id     INTEGER
+    car_id     INTEGER REFERENCES car (id)
 );
 
-SELECT student.name, student.age, faculty.name FROM student
-LEFT JOIN faculty ON student.faculty_id = faculty.id;
 
-SELECT student.name, student.age, faculty.name FROM student
-LEFT JOIN faculty ON student.faculty_id = faculty.id
-RIGHT JOIN avatar ON student.id = avatar.student_id;
