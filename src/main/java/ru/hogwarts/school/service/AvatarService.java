@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,12 +27,16 @@ public class AvatarService {
     @Value("${path.to.avatars.folder}")
     private String avatarsDir;
 
+    Logger logger = LoggerFactory.getLogger(AvatarService.class);
+
     public AvatarService(AvatarRepository avatarRepository, StudentRepository studentRepository) {
         this.avatarRepository = avatarRepository;
         this.studentRepository = studentRepository;
     }
 
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
+
+        logger.info("Upload avatar method was invoked");
 
         Student student = studentRepository.getReferenceById(studentId);
         Path filePath = Path.of(avatarsDir, student + "." + getExtensions(avatarFile.getOriginalFilename()));
@@ -55,15 +61,19 @@ public class AvatarService {
     }
 
     public Avatar findAvatar(Long studentId) {
+        logger.info("Get avatar method was invoked");
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
+
     private String getExtensions(String fileName) {
+        logger.info("Get avatar extension method was invoked");
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
 
     public List<Avatar> findAllAvatars(Integer pageNumber, Integer pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNumber - 1,pageSize);
+        logger.info("Get all avatars method was invoked");
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         return avatarRepository.findAll(pageRequest).getContent();
     }
 }
