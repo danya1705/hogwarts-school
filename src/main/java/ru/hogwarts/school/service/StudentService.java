@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StudentService {
@@ -15,7 +14,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final FacultyService facultyService;
 
-    Logger logger = LoggerFactory.getLogger(StudentService.class);
+    private final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     public StudentService(StudentRepository studentRepository, FacultyService facultyService) {
         this.studentRepository = studentRepository;
@@ -87,14 +86,28 @@ public class StudentService {
         return studentRepository.getStudentsNumber();
     }
 
-    public double getAverageAge() {
-        logger.info("Get students average age method was invoked");
-        return studentRepository.getAverageAge();
-    }
-
     public Collection<Student> getLastStudents() {
         logger.info("Get last five students number method was invoked");
         return studentRepository.getLastStudents();
     }
 
+    public Collection<String> getStudentsNamesStartsWithASortedUpperCase() {
+        logger.info("Get students which names starts with A-letter");
+        return studentRepository.findAll()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(student -> student.getName().toUpperCase())
+                .filter(name -> name.startsWith("A"))
+                .sorted()
+                .toList();
+    }
+
+    public OptionalDouble getAverageAge() {
+        logger.info("Get students average age method was invoked");
+//        return studentRepository.getAverageAge();
+        return studentRepository.findAll()
+                .stream()
+                .mapToInt(Student::getAge)
+                .average();
+    }
 }

@@ -16,7 +16,7 @@ public class FacultyService {
     private final FacultyRepository facultyRepository;
     private final StudentRepository studentRepository;
 
-    Logger logger = LoggerFactory.getLogger(FacultyService.class);
+    private final Logger logger = LoggerFactory.getLogger(FacultyService.class);
 
     public FacultyService(FacultyRepository facultyRepository, StudentRepository studentRepository) {
         this.facultyRepository = facultyRepository;
@@ -71,5 +71,13 @@ public class FacultyService {
 
     public Collection<Student> getStudents(Faculty faculty) {
         return studentRepository.findStudentsByFaculty(faculty);
+    }
+
+    public Optional<String> getLongestFacultyName() {
+        return facultyRepository.findAll()
+                .stream()
+                .map(Faculty::getName)
+                .distinct()
+                .max(Comparator.comparing(String::length));
     }
 }

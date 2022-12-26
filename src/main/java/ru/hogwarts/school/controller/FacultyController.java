@@ -70,4 +70,11 @@ public class FacultyController {
     public Collection<Faculty> getFacultiesByNameOrColor(@RequestParam String nameOrColor) {
             return facultyService.getFacultiesByNameOrColor(nameOrColor);
     }
+
+    @GetMapping("/longest-name")
+    public ResponseEntity<String> getLongestFacultyName() {
+        return facultyService.getLongestFacultyName()
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

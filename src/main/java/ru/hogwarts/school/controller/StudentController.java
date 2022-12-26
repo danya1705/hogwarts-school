@@ -8,6 +8,7 @@ import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 @RestController
 @RequestMapping("student")
@@ -20,7 +21,7 @@ public class StudentController {
     }
 
     @GetMapping("{id}")
-        public ResponseEntity<Student> getStudentInfo(@PathVariable Long id) {
+    public ResponseEntity<Student> getStudentInfo(@PathVariable Long id) {
         Optional<Student> student = studentService.getStudent(id);
         return student
                 .map(ResponseEntity::ok)
@@ -77,12 +78,22 @@ public class StudentController {
     }
 
     @GetMapping("/average-age")
-    public double getAverageAge() {
-        return studentService.getAverageAge();
+    public ResponseEntity<Double> getAverageAge() {
+        OptionalDouble averageAge = studentService.getAverageAge();
+        if (averageAge.isPresent()) {
+            return ResponseEntity.ok(averageAge.getAsDouble());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/last-students")
     public Collection<Student> getLastStudents() {
         return studentService.getLastStudents();
+    }
+
+    @GetMapping("/names-starts-with-a")
+    public Collection<String> getStudentsNamesStartsWithA() {
+        return studentService.getStudentsNamesStartsWithASortedUpperCase();
     }
 }
