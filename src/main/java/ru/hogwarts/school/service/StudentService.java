@@ -95,7 +95,6 @@ public class StudentService {
         logger.info("Get students which names starts with A-letter");
         return studentRepository.findAll()
                 .stream()
-                .filter(Objects::nonNull)
                 .map(student -> student.getName().toUpperCase())
                 .filter(name -> name.startsWith("A"))
                 .sorted()
