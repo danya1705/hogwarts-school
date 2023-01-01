@@ -109,4 +109,45 @@ public class StudentService {
                 .mapToInt(Student::getAge)
                 .average();
     }
+
+    public void printStudentsByMultipleStreams() {
+
+        List<Student> studentList = studentRepository.findAll();
+
+        new Thread(() -> {
+            System.out.println(studentList.get(2));
+            System.out.println(studentList.get(3));
+        }).start();
+
+        new Thread(() -> {
+            System.out.println(studentList.get(4));
+            System.out.println(studentList.get(5));
+        }).start();
+
+        System.out.println(studentList.get(0));
+        System.out.println(studentList.get(1));
+    }
+
+    public void printStudentsByMultipleSynchronizedStreams() {
+
+        List<Student> studentList = studentRepository.findAll();
+
+        new Thread(() -> {
+            printStudent(studentList.get(2));
+            printStudent(studentList.get(3));
+        }).start();
+
+        new Thread(() -> {
+            printStudent(studentList.get(4));
+            printStudent(studentList.get(5));
+        }).start();
+
+        printStudent(studentList.get(0));
+        printStudent(studentList.get(1));
+
+    }
+
+    private synchronized void printStudent(Student student) {
+        System.out.println(student);
+    }
 }

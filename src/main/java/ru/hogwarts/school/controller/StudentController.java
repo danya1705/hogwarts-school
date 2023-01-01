@@ -96,4 +96,13 @@ public class StudentController {
     public Collection<String> getStudentsNamesStartsWithA() {
         return studentService.getStudentsNamesStartsWithASortedUpperCase();
     }
+
+    @GetMapping("/print-students")
+    public void printStudents() {
+        studentService.printStudentsByMultipleStreams();
+    }
+    @GetMapping("/print-students-sync")
+    public void printStudentsSynchronized() {
+        studentService.printStudentsByMultipleSynchronizedStreams();
+    }
 }
