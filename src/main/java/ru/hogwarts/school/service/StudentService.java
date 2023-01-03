@@ -13,6 +13,8 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final FacultyService facultyService;
+    private Integer counter;
+    private final Object flag = new Object();
 
     private final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
@@ -131,23 +133,27 @@ public class StudentService {
     public void printStudentsByMultipleSynchronizedStreams() {
 
         List<Student> studentList = studentRepository.findAll();
+        counter = 0;
 
         new Thread(() -> {
-            printStudent(studentList.get(2));
-            printStudent(studentList.get(3));
+            printStudent(studentList);
+            printStudent(studentList);
         }).start();
 
         new Thread(() -> {
-            printStudent(studentList.get(4));
-            printStudent(studentList.get(5));
+            printStudent(studentList);
+            printStudent(studentList);
         }).start();
 
-        printStudent(studentList.get(0));
-        printStudent(studentList.get(1));
+        printStudent(studentList);
+        printStudent(studentList);
 
     }
 
-    private synchronized void printStudent(Student student) {
-        System.out.println(student);
+    private void printStudent(List<Student> studentList) {
+        synchronized (flag) {
+            System.out.println(studentList.get(counter));
+            counter++;
+        }
     }
 }
